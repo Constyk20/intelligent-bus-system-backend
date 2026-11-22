@@ -108,15 +108,13 @@ def _sample_frame() -> pd.DataFrame:
 
 # ---------- train ----------
 
-def _last_run_at() -> Optional[datetime]:
-    run = (
-        get_database()["model_training_runs"]
-        .find_one({}, sort=[("trained_at", -1)])
-    )
-    if not run:
+def _last_run_at():
+    at = ...  # the value you already load
+    if at is None:
         return None
-    at = run.get("trained_at")
-    if at and at.tzinfo is None:
+    if isinstance(at, str):
+        at = datetime.fromisoformat(at.replace("Z", "+00:00"))
+    if at.tzinfo is None:
         at = at.replace(tzinfo=timezone.utc)
     return at
 
